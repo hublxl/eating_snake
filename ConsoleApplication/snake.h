@@ -8,6 +8,8 @@
 #define WIDTH 15
 #define HEIGH 15
 #define OVERLAP 5 //食物与蛇身重叠次数阈值 
+
+
 //蛇身结构体 
 typedef struct SNAKE Snake;
 struct SNAKE
@@ -32,7 +34,7 @@ char initSnakeFoodDir(Snake *head, Food *food);
 //画墙壁，食物，蛇
 void Drawpicture(Snake *head, Food *food);
 //创建食物,只改坐标，不重新分配空间 
-void creatfood(Food *food);
+void creatfood(Food *food,Snake *head);
 //避免食物和蛇身重叠 
 void avoidoverlap(Snake *head, Food *food);
 //如果生成食物和蛇身重叠次数超过阈值，则按行列顺序指定食物位置 
@@ -46,9 +48,11 @@ Snake *snakegrow(Snake *head);
 //响应用户按键，参数c是按键前的方向
 char setcurkeybutton(char c);
 //蛇的移动
-void snakemove(Snake *head, Snake *rear, char c);
+void snakemove(Snake *head, Snake *rear, Snake *lastrear, char c);
 
+//不闪烁实现
 
-
+void drawwall();
+void draw(Snake *head, Snake *lastrear, int grow,Food* food);
 
 #endif

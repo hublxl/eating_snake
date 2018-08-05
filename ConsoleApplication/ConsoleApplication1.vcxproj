@@ -11,9 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{8B26C4D8-6352-498D-8EC3-340F45152EF1}</ProjectGuid>
+    <ProjectGuid>{242D4649-CA40-4334-A54A-E53AD73750E8}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>ConsoleApplication2</RootNamespace>
+    <RootNamespace>ConsoleApplication1</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -78,11 +78,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="snake.c" />
-    <ClCompile Include="贪吃蛇(闪烁).c" />
+    <ClCompile Include="domain.c" />
+    <ClCompile Include="Snake.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="snake.h" />
+    <ClInclude Include="Snake.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
