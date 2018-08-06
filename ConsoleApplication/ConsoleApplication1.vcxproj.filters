@@ -15,15 +15,15 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="贪吃蛇(闪烁).c">
+    <ClCompile Include="domain.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="snake.c">
+    <ClCompile Include="Snake.c">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="snake.h">
+    <ClInclude Include="Snake.h">
       <Filter>源文件</Filter>
     </ClInclude>
   </ItemGroup>

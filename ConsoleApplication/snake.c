@@ -1,11 +1,17 @@
 #include "snake.h"
 #include <windows.h>
-
+extern int spacenum;
 //初始化蛇身,食物，运动方向 
 char initSnakeFoodDir(Snake *head, Food *food)
 {
-	//蛇头初始位置,围墙正中间的矩形区域内（1/2矩形） 
-	int x = WIDTH / 4 + rand() % WIDTH / 2;
+	//蛇头初始位置,围墙正中间的矩形区域内（1/2矩形）
+	int t=(2*WIDTH) / 4 + rand() % (2*WIDTH) / 2;
+	int x;
+	while (t % 2 != 1)
+	{
+		t = (2 * WIDTH) / 4 + rand() % (2 * WIDTH) / 2;
+	}
+	x = t;
 	int y = HEIGH / 4 + rand() % HEIGH / 2;
 	int i;
 	char c;
@@ -16,7 +22,7 @@ char initSnakeFoodDir(Snake *head, Food *food)
 	head->next = NULL;
 
 	//初始化食物,此处并不考虑是否与蛇重叠	
-	creatfood(food);
+	creatfood(food,head);
 	//处理食物与蛇身重叠的情况
 	avoidoverlap(head, food);
 	//随即设置初始运动方向 
@@ -96,10 +102,43 @@ void Drawpicture(Snake *head, Food *food)
 
 }
 //创建食物,只改坐标，不重新分配空间 
-void creatfood(Food *food)
+void creatfood(Food *food,Snake *head)
 {
-	food->x = rand() % (WIDTH - 1) + 1;
+	int t,a;
+	t = rand() % (2 * WIDTH - 2) + 1;
+	if (head->x - t < 0)
+	{
+		a = t - head->x;
+	}
+	else
+	{
+		a = head->x - t;
+	}
+	while (a % 2 != 0)
+	{
+		t = rand() % (2 * WIDTH - 2) + 1;
+		if (head->x - t < 0)
+		{
+			a = t - head->x;
+		}
+		else
+		{
+			a = head->x - t;
+		}
+	}
+	food->x = t;
 	food->y = rand() % (HEIGH - 1) + 1;
+	if (head->x == food->x&&head->y == food->y)
+	{
+		while (food->y == head->y)
+		{
+			food->y = rand() % (HEIGH - 1) + 1;
+
+		}
+
+	}
+	//food->x = rand() % (2 * WIDTH - 1) + 1;
+	//food->y = rand() % (HEIGH - 1) + 1;
 	food->c = 65 + rand() % 26;//生成随机大写字母 
 
 }
@@ -125,7 +164,7 @@ void avoidoverlap(Snake *head, Food *food)
 			{
 				num++;
 				flag = 1;
-				creatfood(food);
+				creatfood(food,head);
 				break;
 			}
 			p = p->next;
@@ -139,9 +178,9 @@ void setfoodlocation(Snake *head, Food *food)
 {
 	int i, j, flag;
 	Snake *p;
-	for (i = 0; i<WIDTH; i++)
+	for (i = 1; i<2*WIDTH-2; i+2)
 	{
-		for (j = 0; j<HEIGH; j++)
+		for (j = 1; j<HEIGH; j++)
 		{
 			p = head;
 			flag = 0;
@@ -152,7 +191,7 @@ void setfoodlocation(Snake *head, Food *food)
 					flag = 1;
 					break;
 				}
-
+				p = p->next;
 			}
 			if (flag == 0)
 			{
@@ -161,17 +200,16 @@ void setfoodlocation(Snake *head, Food *food)
 				return;
 			}
 
-
 		}
 
-
 	}
+
 }
 //判断游戏是否失败，蛇头碰身或蛇头撞墙，游戏失败
 int isfailure(Snake *head)
 {
 	Snake *p = head->next;
-	if (head->x<0 || head->x >= WIDTH || head->y<0 || head->y >= HEIGH)
+	if (head->x<=0 || head->x >= 2*WIDTH || head->y<=0 || head->y > HEIGH)
 		return 1;
 
 	while (p != NULL)
@@ -213,24 +251,62 @@ Snake *snakegrow(Snake *head)
 char setcurkeybutton(char c)
 {
 	char c2 = getch();//获取用户当前的按键
-	if (c2 == 27)//用户按esc，结束游戏 
-		c = 'x';
-	else if (c2 == 'a'&&c != 'd')
-		c = c2;
-	else if (c2 == 'w'&&c != 's')
-		c = c2;
-	else if (c2 == 'd'&&c != 'a')
-		c = c2;
-	else if (c2 == 's'&&c != 'w')
-		c = c2;
-	return c;
+	//如果前一次按下的是暂停键(空格)
+	if (c == 'p')
+	{
+/*		while (c2 != 27 || c2 != 32)
+		{
+			c2 = getch();
+		}
+*/
+			if (c2 == 27)//用户按esc，结束游戏,在暂停的状态下结束游戏 
+			{
+				c2 = 'x';
+				return c2;
+			}
+			else if (c2 == 32)//在前一次是暂停的基础上,又按暂停
+			{
+				c2 = 'p';
+				spacenum++;
+				return c2;
+			}
+			else
+				return c;
+	
+	}
+	else
+	{
+		if (c2 == 27)//用户按esc，结束游戏 
+		{
+			c2 = 'x';
+			return c2;
+		}
+		else if (c2 == 32)//32是空格的键值
+		{
+			c2 = 'p';
+			spacenum++;
+			return c2;
+		}
+		else if (c2 == 'a'&&c != 'd')
+			return c2;
+		else if (c2 == 'w'&&c != 's')
+			return c2;
+		else if (c2 == 'd'&&c != 'a')
+			return c2;
+		else if (c2 == 's'&&c != 'w')
+			return c2;
+		else
+			return c;
+	}
+
 }
 //蛇的移动
-void snakemove(Snake *head, Snake *rear, char c)
+void snakemove(Snake *head, Snake *rear, Snake *lastrear, char c)
 {
 	//坐标传递，从蛇尾开始依次获取前一个结点的坐标，付给当前结点 
 	Snake *p = rear;
-
+	lastrear->x = rear->x;//保存最后一个结点的坐标,如果没吃到食物,就用空格对其进行覆盖,若吃到食物,不用管就是画了
+	lastrear->y = rear->y;
 	while (p->pre != NULL)
 	{
 		p->x = p->pre->x;
@@ -239,14 +315,71 @@ void snakemove(Snake *head, Snake *rear, char c)
 	}
 	//单独处理头的移动（与运动方向有关）
 	if (c == 'a')
-		head->x--;
+		head->x-=2;
 	if (c == 'w')
 		head->y--;
 	if (c == 's')
 		head->y++;
 	if (c == 'd')
-		head->x++;
+		head->x+=2;
 
 }
 
+//画墙
+void drawwall()
+{
+	int i, j;
+	system("cls");
+	gotoxy(0, 0);
+	printf("------------------------------");
+	for (i = 0; i < HEIGH; i++)
+	{
+		gotoxy(0, i + 1);
+		printf("|");
+		for (j = 0; j < WIDTH; j++)
+		{
+			printf("  ");
 
+		}
+		printf("|");
+
+	}
+	gotoxy(0, HEIGH + 1);
+	printf("------------------------------\n");
+
+}
+void draw(Snake *head, Snake *lastrear, int grow, Food* food)
+{
+	Snake *p = head->next;
+	//画食物
+	gotoxy(food->x, food->y);
+	printf("%c", food->c);
+	printf("%c", food->c);
+	if (grow == 0)
+	{
+		gotoxy(lastrear->x, lastrear->y);
+		printf("  ");//用空格将之前的格子刷新覆盖
+	}
+	else
+	{
+		grow = 0;
+		
+	}
+	gotoxy(head->x, head->y);
+	printf("■");
+	if (p != NULL)
+	{
+		gotoxy(p->x, p->y);
+		printf("□");
+	}
+	
+/*
+	while (p != NULL)
+	{
+		gotoxy((p->x), p->y);
+		printf("□");
+		p = p->next;
+	}
+	//printf(" ");
+*/
+}

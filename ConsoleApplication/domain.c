@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include "snake.h"
 #include <time.h>//随机数，定时器_sleep() 
+
+int spacenum=0;
 void gotoxy(int x, int y)
 {
 	COORD pos;
@@ -11,8 +13,9 @@ void gotoxy(int x, int y)
 }
 void main()
 {
-	char c;//蛇移动的方向
-
+	char c=0;//蛇移动的方向
+	char cpre;
+	int grow;
 	Snake snake, *head, *rear;
 	Snake *lastrear;
 	srand((unsigned)time(NULL));//初始化随机数种子
@@ -20,6 +23,7 @@ void main()
 	//初始化蛇身，食物，刚开始蛇只有一节
 	head = rear = &snake;
 	Food *food = (Food*)malloc(sizeof(Food));
+	lastrear = (Snake *)malloc(sizeof(Snake));
 
 	printf("\t\t======欢迎使用贪吃蛇游戏======\t\t\n");
 	printf("游戏说明：\n");
@@ -30,47 +34,82 @@ void main()
 	getch();
 
 	//初始化蛇，食物，运动方向
-	c = initSnakeFoodDir(head, food);
-
-
+	cpre = initSnakeFoodDir(head, food);
+	
+	drawwall();
+	gotoxy(0, 19);
+	printf("初始化的方向是%c\n", cpre);
 	while (1)
 	{
-
+		grow = 0;
 		//蛇是否吃到食物 
 		if (isSnakemeetFood(head, food))
 		{
 			rear = snakegrow(head);//蛇身增长
-			creatfood(food);    //随机生成食物，其实就是重新设置坐标 
+			creatfood(food,head);    //随机生成食物，其实就是重新设置坐标 
 			avoidoverlap(head, food);//避免食物和蛇身重叠
-
+			grow = 1;
 		}
+		
 		//玩家按键处理
 		if (kbhit())
-
-			c = setcurkeybutton(c);
+		{
+			c = setcurkeybutton(cpre);
+			gotoxy(0, 20);
+			printf("按下的键%c", c);
+		}
+			
+		if (c != 'x'&&c != 'p'&&c!=0)
+		{
+			cpre = c;//cpre只记录正常的方向,不记录退出,暂停
+			gotoxy(0, 21);
+			printf("更新的方向%c", cpre);
+		}
 		if (c == 'x')
 		{
+			gotoxy(0, 17);
 			puts("用户终止\nGame over\n");
 			break;
 		}
+		if (c == 'p')
+		{
+			while (spacenum % 2 != 0)
+			{
+				if (kbhit())
+					c = setcurkeybutton(c);
+				if (c == 'x')
+				{
+					break;
+				}
 
+			}
+			if (c == 'x')
+			{
+				gotoxy(0, 17);
+				puts("用户终止\nGame over\n");
+				break;
+			}
+		}
+		gotoxy(0, 22);
+		printf("初始化之后将要运动的方向%c", cpre);
 
 		//蛇的移动
-		snakemove(head, rear, c);
+		snakemove(head, rear,lastrear, cpre);
 		if (isfailure(head))
 		{
+			gotoxy(0, 17);
 			printf("游戏失败\n");
 			break;
 		}
 
 		//绘制画面 
-		Drawpicture(head, food);
-
+		//Drawpicture(head, food);
+		draw(head, lastrear, grow, food);
 		//_sleep(200);//屏幕刷新间隔 
 		Sleep(200);
 
 	}
-	//gotoxy(0,17);
+	gotoxy(0,18);
 	printf("谢谢使用，再见\n");
 	system("pause");
 
